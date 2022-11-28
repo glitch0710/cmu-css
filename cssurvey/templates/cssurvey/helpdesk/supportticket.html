@@ -1,0 +1,134 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block title %} Help Desk Online {% endblock %}
+
+{% block page_title %} <a class="navbar-brand" href="{% url 'help_desk' %}">Help Desk</a> {% endblock %}
+
+{% block content %}
+
+<main>
+    <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
+        <div class="container">
+            <div class="page-header-content pt-4">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-auto mt-4">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="archive"></i></div>
+                            Ticket Support Center
+                        </h1>
+<!--                        <div class="page-header-subtitle">Address client's concern. Create and change ticket status</div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container mt-n10">
+        <div class="card card-header-actions mx-auto">
+            <div class="card-header">
+                {{ ticket.title }}
+                <div>
+                    <a class="btn btn-danger btn-sm btn-icon mr-2" href="{% url 'help_desk' %}">
+                        <i data-feather="x"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 col-xl-12">
+                            <div class="d-flex align-items-center justify-content-between flex-column flex-md-row">
+                                <h2 class="mb-0">Ticket #{{ ticket.id }}</h2>
+                                {% if ticket.status == 1 %}
+                                    <div class="h5"><span class="badge badge-warning-soft text-warning font-weight-normal">Open - Awaiting Response</span></div>
+                                {% elif ticket.status == 2 %}
+                                    <div class="h5"><span class="badge badge-danger-soft text-danger font-weight-normal">Declined ({{ ticket.closed_date|date:'l, F d Y' }})</span></div>
+                                {% elif ticket.status == 3 %}
+                                    <div class="h5"><span class="badge badge-success-soft text-success font-weight-normal">Closed - Marked as resolved ({{ ticket.closed_date|date:'l, F d Y' }})</span></div>
+                                {% endif %}
+                            </div>
+                            <hr class="mb-4" />
+                            {% include 'cssurvey/messages.html' %}
+                            {% if ticket.status == 3 %}
+                                <div class="alert alert-success alert-icon d-flex justify-content-between" role="alert">
+                                    <div class="alert-icon-content">
+                                        <h6 class="alert-heading">Generated Link</h6>
+                                        <p id="genlinks" style="display: none;">{{ generated_link.generated_link }}</p>
+                                        Click the button to copy the generated link for the closed ticket
+                                    </div>
+                                    <button class="btn btn-outline-success" type="button" onclick="copyToClipboard('#genlinks')" tabindex="0" data-trigger="focus" title="" data-container="body" data-toggle="popover" data-placement="top" data-content="copied!">
+                                        <i class="fas fa-link mr-2"></i>
+                                        Copy Link
+                                    </button>
+                                </div>
+                            {% endif %}
+                            <div class="card mb-5">
+                                <div class="card-header d-flex justify-content-between">
+                                    <div class="mr-2 text-dark">
+                                        {{ ticket.name }}
+                                        <div class="text-xs text-muted">{{ ticket.date_filed|date:'l, F d Y @ h:i A' }}</div>
+                                    </div>
+                                    <a href="#!">#{{ ticket.id }}</a>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-justify">{{ ticket.complaint|linebreaks }}</p>
+                                    <hr />
+                                    <p class="mb-0 small">{{ ticket.name }}<br /><a href="#!">{{ ticket.email }}</a></p>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">Add Reply</div>
+                                <div class="card-body">
+                                    <textarea class="form-control mb-2" rows="4"></textarea>
+                                    <div class="d-flex">
+                                        <div class="mr-auto p-2"><button class="btn btn-primary btn-sm mr-2"><i class="fas fa-paper-plane mr-2"></i>Add Reply</button></div>
+                                        <div class="p-2"><button class="btn btn-danger btn-sm mr-2" type="button" data-toggle="modal" data-target="#declineTicketModal" {% if ticket.status == 2 or ticket.status == 3 %} disabled {% endif %}><i class="fas fa-window-close mr-2"></i>Decline Ticket</button></div>
+                                        <div class="p-2"><button class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#closeTicketModal" {% if ticket.status == 2 or ticket.status == 3 %} disabled {% endif %}><i class="fas fa-tag mr-2"></i>Mark as Resolved</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modals-->
+    <form action="{% url 'close_ticket' ticket.id %}" method="POST">
+        {% csrf_token %}
+        <div class="modal fade" id="closeTicketModal" tabindex="-1" role="dialog" aria-labelledby="closeTicketModalTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="closeTicketModalTitle">Close Ticket?</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">Are you sure you want to mark this ticket as resolved?</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-dismiss="modal">No</button>
+                        <button class="btn btn-success mr-2" type="submit" role="button">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <form action="{% url 'decline_ticket' ticket.id %}" method="POST">
+        {% csrf_token %}
+        <div class="modal fade" id="declineTicketModal" tabindex="-1" role="dialog" aria-labelledby="declineTicketModalTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="declineTicketModalTitle">Decline Ticket?</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">Are you sure you want to mark this ticket as declined?</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-dismiss="modal">No</button>
+                        <button class="btn btn-success mr-2" type="submit" role="button">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+{% endblock %}

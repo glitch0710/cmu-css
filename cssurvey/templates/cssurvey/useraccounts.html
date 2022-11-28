@@ -1,0 +1,188 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block title %} OCSS Control Panel {% endblock %}
+
+{% block page_title %} <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a> {% endblock %}
+
+{% block content %}
+
+{% load static %}
+<main>
+    <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
+        <div class="container">
+            <div class="page-header-content pt-4">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-auto mt-4">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="users"></i></div>
+                            User Accounts
+                        </h1>
+                        <div class="page-header-subtitle">View or update user details</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main page content-->
+    <div class="container mt-n10">
+        <div class="card mb-4 card-header-actions mx-auto">
+            <div class="card-header">
+                User Accounts Management
+                <div>
+                    <button class="btn btn-primary btn-icon mr-2" name="addUser" id="addUser" type="button" data-toggle="modal" data-target="#createUserModal">
+                        <i data-feather="user-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% include 'cssurvey/messages.html' %}
+                <div class="datatable">
+                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Firstname</th>
+                                <th>Lastname</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Username</th>
+                                <th>Firstname</th>
+                                <th>Lastname</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            {% for user in users %}
+                                {% if user.id != userid %}
+                                    <tr>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.first_name }}</td>
+                                        <td>{{ user.last_name }}</td>
+                                        <td>{{ user.email }}</td>
+                                        {% if user.is_active %}
+                                            <td><div class="badge badge-success badge-pill">Active</div></td>
+                                        {% else %}
+                                            <td><div class="badge badge-warning badge-pill">Inactive</div></td>
+                                        {% endif %}
+                                        <td>
+                                            <a class="btn btn-datatable btn-icon btn-transparent-dark mr-2" href="{% url 'view_user' user.id %}"><i data-feather="eye"></i></a>
+                                            <a class="btn btn-datatable btn-icon btn-transparent-dark" href="{% url 'change_password' user.id %}"><i data-feather="settings"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    {{ form.as_p }}-->
+    <br>
+<!--    {{ form1.as_p }}-->
+
+    <!--Modals-->
+    <form action="{% url 'user_accounts' %}" method="POST">
+        {% csrf_token %}
+        <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New User</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container mt-4">
+                            <div class="row">
+                                <div class="col-xl-4">
+                                    <!-- Profile picture card-->
+                                    <div class="card">
+                                        <div class="card-header">Profile Picture</div>
+                                        <div class="card-body text-center">
+                                            <!-- Profile picture image-->
+                                            <img class="img-account-profile rounded-circle mb-2" src="{% static 'assets1/img/illustrations/profiles/profile-1.png' %}" alt="" />
+                                            <!-- Profile picture help block-->
+                                            <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+                                            <!-- Profile picture upload button-->
+                                            <button class="btn btn-primary" type="button">Upload new image</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-8">
+                                    <!-- Account details card-->
+                                    <div class="card mb-4">
+                                        <div class="card-header">Account Details</div>
+                                        <div class="card-body">
+                                            <form>
+                                                <!-- Form Group (username)-->
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="username">Username</label>
+                                                    <input class="form-control" id="username" name="username" type="text" placeholder="Enter your username" />
+                                                </div>
+                                                <!-- Form Row-->
+                                                <div class="form-row">
+                                                    <!-- Form Group (first name)-->
+                                                    <div class="form-group col-md-6">
+                                                        <label class="small mb-1" for="first_name">First name</label>
+                                                        <input class="form-control" id="first_name" name="first_name" type="text" placeholder="Enter your first name" />
+                                                    </div>
+                                                    <!-- Form Group (last name)-->
+                                                    <div class="form-group col-md-6">
+                                                        <label class="small mb-1" for="last_name">Last name</label>
+                                                        <input class="form-control" id="last_name" name="last_name" type="text" placeholder="Enter your last name" />
+                                                    </div>
+                                                </div>
+                                                <!-- Form Row-->
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label class="small mb-1" for="job_position">Job Position</label>
+                                                        <input class="form-control" id="job_position" name="job_position" type="text" placeholder="Enter job position" value="{{ profile_details.job_position }}"/>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label class="small mb-1" for="email">Email address</label>
+                                                        <input class="form-control" id="email" type="email" name="email" placeholder="Enter your email address" value="{{ profile.email }}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="id_office_id">Office</label>
+                                                    {{ form_profile.office_id }}
+                                                </div>
+
+                                                <hr>
+                                                <!-- Password-->
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label class="small mb-1" for="password1">Password</label>
+                                                        <input class="form-control" id="password1" name="password1" type="password" autocomplete="new-password" placeholder="Enter your password" />
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label class="small mb-1" for="password2">Password Confirmation</label>
+                                                        <input class="form-control" id="password2" name="password2" type="password" autocomplete="new-password" placeholder="Enter the same password as before, for verification" />
+                                                    </div>
+                                                </div>
+
+                                                <!-- Save changes button-->
+                                                <button class="btn btn-primary" type="submit">Save changes</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-primary" type="button" data-dismiss="modal">Close</button></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+{% endblock %}

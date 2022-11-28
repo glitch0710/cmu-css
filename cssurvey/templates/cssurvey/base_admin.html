@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load static %}
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>{% block title %} {% endblock %}</title>
+        <link href="{% static 'css1/styles.css' %}" rel="stylesheet" />
+        <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon.ico' %}" />
+        <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
+        <script src="{% static 'main.js' %}"></script>
+    </head>
+    <body class="nav-fixed">
+        <nav class="topnav navbar navbar-expand shadow justify-content-between justify-content-sm-start navbar-light bg-white" id="sidenavAccordion">
+            <!-- Navbar Brand-->
+            <!-- * * Tip * * You can use text or an image for your navbar brand.-->
+            <!-- * * * * * * When using an image, we recommend the SVG format.-->
+            <!-- * * * * * * Dimensions: Maximum height: 32px, maximum width: 240px-->
+            {% block page_title %}{% endblock %}
+            <!-- Sidenav Toggle Button-->
+            <button class="btn btn-icon btn-transparent-dark order-1 order-lg-0 mr-lg-2" id="sidebarToggle"><i data-feather="menu"></i></button>
+            <!-- Navbar Search Input-->
+            <!-- * * Note: * * Visible only on and above the md breakpoint-->
+            <form class="form-inline mr-auto d-none d-md-block mr-3">
+                <div class="input-group input-group-joined input-group-solid">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
+                    <div class="input-group-append">
+                        <div class="input-group-text"><i data-feather="search"></i></div>
+                    </div>
+                </div>
+            </form>
+            <!-- Navbar Items-->
+            <ul class="navbar-nav align-items-center ml-auto">
+                <!-- Navbar Search Dropdown-->
+                <!-- * * Note: * * Visible only below the md breakpoint-->
+                <li class="nav-item dropdown no-caret mr-3 d-md-none">
+                    <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="searchDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i data-feather="search"></i></a>
+                    <!-- Dropdown - Search-->
+                    <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--fade-in-up" aria-labelledby="searchDropdown">
+                        <form class="form-inline mr-auto w-100">
+                            <div class="input-group input-group-joined input-group-solid">
+                                <input class="form-control" type="text" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2" />
+                                <div class="input-group-append">
+                                    <div class="input-group-text"><i data-feather="search"></i></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+                <!-- Alerts Dropdown-->
+                <li class="nav-item dropdown no-caret d-none d-sm-block mr-3 dropdown-notifications">
+                    <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownAlerts" href="javascript:void(0);" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i data-feather="bell"></i></a>
+                    <div class="dropdown-menu dropdown-menu-right border-0 shadow animated--fade-in-up" aria-labelledby="navbarDropdownAlerts">
+                        <h6 class="dropdown-header dropdown-notifications-header">
+                            <i class="mr-2" data-feather="bell"></i>
+                            Alerts Center
+                        </h6>
+                        <!-- Example Alert 1-->
+                        <a class="dropdown-item dropdown-notifications-item" href="#!">
+                            <div class="dropdown-notifications-item-icon bg-warning"><i data-feather="activity"></i></div>
+                            <div class="dropdown-notifications-item-content">
+                                <div class="dropdown-notifications-item-content-details">December 29, 2020</div>
+                                <div class="dropdown-notifications-item-content-text">This is an alert message. It's nothing serious, but it requires your attention.</div>
+                            </div>
+                        </a>
+                        <a class="dropdown-item dropdown-notifications-footer" href="#!">View All Alerts</a>
+                    </div>
+                </li>
+                <!-- User Dropdown-->
+                <li class="nav-item dropdown no-caret mr-3 mr-lg-0 dropdown-user">
+                    <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" href="javascript:void(0);" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img class="img-fluid" src="{% static 'assets/img/illustrations/profiles/profile-1.png' %}" /></a>
+                    <div class="dropdown-menu dropdown-menu-right border-0 shadow animated--fade-in-up" aria-labelledby="navbarDropdownUserImage">
+                        <h6 class="dropdown-header d-flex align-items-center">
+                            <img class="dropdown-user-img" src="{% static 'assets/img/illustrations/profiles/profile-1.png' %}" />
+                            <div class="dropdown-user-details">
+                                <div class="dropdown-user-details-name">{{ request.user.get_short_name }}</div>
+                                <div class="dropdown-user-details-email">{{ request.user.email }}</div>
+                            </div>
+                        </h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'my_account' %}">
+                            <div class="dropdown-item-icon"><i data-feather="settings"></i></div>
+                            Account
+                        </a>
+                        <a class="dropdown-item" href="#" onclick="$('#signOutBtn').click()">
+                            <div class="dropdown-item-icon"><i data-feather="log-out"></i></div>
+                            Logout
+                        </a>
+                        <form style='display: none;' method="POST" action="{% url 'logoutuser' %}">
+                            {% csrf_token %}
+                            <button id="signOutBtn" type="submit">Logout</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <div id="layoutSidenav">
+            <div id="layoutSidenav_nav">
+                <nav class="sidenav shadow-right sidenav-light">
+                  <div class="sidenav-menu">
+                      <div class="nav accordion" id="accordionSidenav">
+                          <!-- Sidenav Menu Heading (Account)-->
+                          <!-- * * Note: * * Visible only on and above the sm breakpoint-->
+                          <div class="sidenav-menu-heading d-sm-none">Account</div>
+                          <!-- Sidenav Link (Alerts)-->
+                          <!-- * * Note: * * Visible only on and above the sm breakpoint-->
+                          <a class="nav-link d-sm-none" href="#!">
+                              <div class="nav-link-icon"><i data-feather="bell"></i></div>
+                              Alerts
+                              <span class="badge badge-warning-soft text-warning ml-auto">4 New!</span>
+                          </a>
+                          <!-- Sidenav Link (Messages)-->
+                          <!-- * * Note: * * Visible only on and above the sm breakpoint-->
+                          <a class="nav-link d-sm-none" href="#!">
+                              <div class="nav-link-icon"><i data-feather="mail"></i></div>
+                              Messages
+                              <span class="badge badge-success-soft text-success ml-auto">2 New!</span>
+                          </a>
+
+                          <!-- Sidenav Menu Heading (Menu)-->
+                          {% if user_group == 1 %}
+                              <div class="sidenav-menu-heading">Menu</div>
+
+                              <a class="nav-link" href="{% url 'controlpanel' %}">
+                                  <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                                  Dashboard
+                              </a>
+
+                              <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse" data-target="#collapseDashboards" aria-expanded="false" aria-controls="collapseDashboards">
+                                  <div class="nav-link-icon"><i data-feather="monitor"></i></div>
+                                  Monitoring
+                                  <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                              </a>
+                              <div class="collapse" id="collapseDashboards" data-parent="#accordionSidenav">
+                                  <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
+                                      <a class="nav-link" href="{% url 'offices' %}">Offices</a>
+                                      <a class="nav-link" href="{% url 'questions' %}">Questions</a>
+                                  </nav>
+                              </div>
+                              <!-- Sidenav Heading (Reports)-->
+                              <div class="sidenav-menu-heading">Reports</div>
+                              <!-- Sidenav Accordion (Data Visualization)-->
+                              <a class="nav-link" href="{% url 'data_visualization' %}">
+                                  <div class="nav-link-icon"><i data-feather="pie-chart"></i></div>
+                                  Data Visualization
+                              </a>
+                          {% endif %}
+
+                          {% if user_group == 3 %}
+                              <!-- Sidenav Heading (User Dashboard)-->
+                              <div class="sidenav-menu-heading">User</div>
+                              <!-- Sidenav Accordion (Dashboard)-->
+                              <a class="nav-link" href="{% url 'help_desk' %}">
+                                  <div class="nav-link-icon"><i data-feather="clipboard"></i></div>
+                                  User Dashboard
+                              </a>
+                              <div class="sidenav-menu-heading">Tickets</div>
+                              <a class="nav-link" href="{% url 'active_ticket' %}">
+                                  <div class="nav-link-icon"><i data-feather="file-text"></i></div>
+                                  Active Tickets
+                                  <span class="badge badge-primary-soft text-primary ml-auto">{{ ticket_open }}</span>
+                              </a>
+                              <a class="nav-link" href="{% url 'closed_ticket' %}">
+                                  <div class="nav-link-icon"><i data-feather="archive"></i></div>
+                                  Closed Tickets
+                                  <span class="badge badge-primary-soft text-primary ml-auto">{{ ticket_close }}</span>
+                              </a>
+                              <a class="nav-link" href="{% url 'declined_ticket' %}">
+                                  <div class="nav-link-icon"><i data-feather="x-circle"></i></div>
+                                  Declined Tickets
+                                  <span class="badge badge-primary-soft text-primary ml-auto">{{ ticket_declined }}</span>
+                              </a>
+                          {% endif %}
+
+                          {% if user_group == 2 %}
+                              <!-- Sidenav Heading (User Dashboard)-->
+                              <div class="sidenav-menu-heading">User</div>
+                              <!-- Sidenav Accordion (Dashboard)-->
+                              <a class="nav-link" href="{% url 'office_admin' %}">
+                                  <div class="nav-link-icon"><i data-feather="clipboard"></i></div>
+                                  User Dashboard
+                              </a>
+                              <div class="sidenav-menu-heading">Office</div>
+                              <a class="nav-link" href="{% url 'office_transactions' %}">
+                                  <div class="nav-link-icon"><i data-feather="monitor"></i></div>
+                                  Office Transaction
+                              </a>
+                          {% endif %}
+
+                          <!-- Sidenav Heading (Reports)-->
+                          <div class="sidenav-menu-heading">Account Settings</div>
+                          {% if user_group == 1 %}
+                              <!-- Sidenav Accordion (User Accounts)-->
+                              <a class="nav-link" href="{% url 'user_accounts' %}">
+                                  <div class="nav-link-icon"><i data-feather="users"></i></div>
+                                  User Accounts
+                              </a>
+                          {% endif %}
+
+                          <!-- Sidenav Accordion (User Accounts)-->
+                          {% if user_group == 1 %}
+                              <a class="nav-link" href="{% url 'my_account' %}">
+                                  <div class="nav-link-icon"><i data-feather="settings"></i></div>
+                                  My Account
+                              </a>
+                          {% else %}
+                              <a class="nav-link" href="{% url 'helpdesk_monitoring_account' %}">
+                                  <div class="nav-link-icon"><i data-feather="settings"></i></div>
+                                  My Account
+                              </a>
+                          {% endif %}
+                      </div>
+                  </div>
+                    <!-- Sidenav Footer-->
+                    <div class="sidenav-footer">
+                        <div class="sidenav-footer-content">
+                            <div class="sidenav-footer-subtitle">Logged in as:</div>
+                            <div class="sidenav-footer-title">{{ request.user.get_full_name }}</div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div id="layoutSidenav_content">
+                {% block content %}{% endblock %}
+                <footer class="footer mt-auto footer-light">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6 small">Copyright &copy; DTO CSS 2021</div>
+                            <div class="col-md-6 text-md-right small">
+                                <a href="#!">Privacy Policy</a>
+                                &middot;
+                                <a href="#!">Terms &amp; Conditions</a>
+                                &middot;
+<!--                                <a href="http://www.djangoproject.com/"><img src="https://www.djangoproject.com/m/img/badges/djangopowered126x54.gif" border="0" alt="Powered by Django." title="Powered by Django." /></a>-->
+<!--                                <a href="http://www.djangoproject.com/"><img src="https://www.djangoproject.com/m/img/badges/djangosite80x15.gif" border="0" alt="A Django site." title="A Django site." /></a>-->
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <script type="javascript">
+            function copyToClipboard(element) {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($(element).text()).select();
+                document.execCommand("copy");
+                $temp.remove();
+            }
+        </script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="{% static 'js1/scripts.js' %}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" crossorigin="anonymous"></script>
+        <script src="{% static 'assets1/demo/chart-area-demo.js' %}"></script>
+        <script src="{% static 'assets1/demo/chart-pie-demo.js' %}"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
+        <script src="{% static 'assets1/demo/datatables-demo.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" crossorigin="anonymous"></script>
+        <script src="{% static 'assets1/demo/date-range-picker-demo.js' %}"></script>
+        {% block chart_js %}{% endblock %}
+    </body>
+</html>

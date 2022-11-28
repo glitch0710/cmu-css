@@ -1,0 +1,13 @@
+{% extends "cssurvey/base_css.html" %}
+
+{% block content %}
+
+{% load static %}
+
+<div class="text-center mt-4">
+    <img class="img-fluid p-4" src="{% static 'assets/img/illustrations/404-error-with-a-cute-animal.svg' %}" alt="Not Found" style="height: 400px"/>
+    <p class="lead">{{ title }}</p>
+    <p class="lead">{{ message }}</p>
+</div>
+
+{% endblock %}

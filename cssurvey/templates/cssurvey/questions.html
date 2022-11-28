@@ -1,0 +1,152 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block title %} OCSS Control Panel {% endblock %}
+
+{% block page_title %} <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a> {% endblock %}
+
+{% block content %}
+
+<main>
+    <header class="page-header page-header-dark bg-gradient-primary-to-secondary mb-4">
+        <div class="container">
+            <div class="page-header-content pt-4">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-auto mt-4">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="help-circle"></i></div>
+                            Survey Questions
+                        </h1>
+                        <div class="page-header-subtitle">Basic information and setup of survey questions</div>
+                    </div>
+                </div>
+                <form action="{% url 'questions' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="page-header-search mt-4">
+                        <div class="input-group input-group-joined">
+                            <input class="form-control"  name="searchQuestion" id="searchQuestion" type="text" placeholder="Search..." aria-label="Search" autofocus />
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i data-feather="search"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </header>
+    <!-- Main page content-->
+    <div class="container">
+        {% include 'cssurvey/messages.html' %}
+        {% if active != '' %}
+            <h4 class="mb-0 mt-5">Active Questions on Display</h4>
+            <hr class="mt-2 mb-4" />
+            <!-- Active Questions-->
+            {% for activeque in active %}
+                <a class="card card-icon lift lift-sm mb-4" href="{% url 'viewquestion' activeque.qid %}">
+                    <div class="row no-gutters">
+                        <div class="col-auto card-icon-aside bg-info"><i class="text-white-50" data-feather="check-circle"></i></div>
+                        <div class="col">
+                            <div class="card-body py-4">
+                                <h5 class="card-title text-success mb-2">Question No. {{ activeque.qid }}</h5>
+                                <p class="card-text mb-1">{{ activeque.survey_question }}</p>
+                                <div class="small text-muted">Active</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        {% endif %}
+        {% if inactive != '' %}
+            <h4 class="mb-0 mt-5">Inactive Questions</h4>
+            <hr class="mt-2 mb-4" />
+            <div class="row">
+                {% for inactiveque in inactive %}
+                    <div class="col-lg-4 mb-4">
+                        <!-- Inactive Questions-->
+                        <a class="card lift lift-sm h-100" href="{% url 'viewquestion' inactiveque.qid %}">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning mb-2">
+                                    <i class="mr-2" data-feather="x-circle"></i>
+                                    Question No. {{ inactiveque.qid }}
+                                </h5>
+                                <p class="card-text mb-1">{{ inactiveque.survey_question }}</p>
+                            </div>
+                            <div class="card-footer"><div class="small text-muted">Inactive</div></div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if searched != '' %}
+            <h4 class="mb-0 mt-5">Result from searched question</h4>
+            <hr class="mt-2 mb-4" />
+            <!-- Active Questions-->
+            {% for question in searched %}
+                <a class="card card-icon lift lift-sm mb-4" href="{% url 'viewquestion' question.qid %}">
+                    <div class="row no-gutters">
+                        {% if question.display_status == 1 %}
+                            <div class="col-auto card-icon-aside bg-info"><i class="text-white-50" data-feather="check-circle"></i></div>
+                        {% else %}
+                            <div class="col-auto card-icon-aside bg-warning"><i class="text-white-50" data-feather="x-circle"></i></div>
+                        {% endif %}
+                        <div class="col">
+                            <div class="card-body py-4">
+                                <h5 class="card-title text-success mb-2">Question No. {{ question.qid }}</h5>
+                                <p class="card-text mb-1">{{ question.survey_question }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+            <div class="text-center mt-5">
+                <div class="mb-3">
+                    <a class="btn btn-primary mx-2 px-3" role="button" href="{% url 'questions' %}">
+                        <i class="mr-2" data-feather="stop-circle"></i>
+                        Stop Search
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        <div class="text-center mt-5">
+            <h4 class="mb-3">Add New Survey Question</h4>
+            <div class="mb-3">
+                <button class="btn btn-success mx-2 px-3" name="addQuestion" id="addQuestion" type="button" data-toggle="modal" data-target="#createQuestionModal">
+                    <i class="mr-2" style="width: 20px; height: 20px" data-feather="file-plus"></i>
+                    New Question
+                </button>
+            </div>
+        </div>
+    </div>
+    <form action="{% url 'create_question' %}" method="POST">
+        {% csrf_token %}
+        <div class="modal fade" id="createQuestionModal" tabindex="-1" role="dialog" aria-labelledby="createQuestionModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Question</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="survey_question">Survey Question</label>
+                            <textarea class="form-control" id="survey_question" name="survey_question" rows="8"></textarea>
+                        </div>
+                        {% comment %} <div class="form-group form-check">
+                            <input type="checkbox" name="display_status" class="form-check-input" id="display_status" />
+                            <label class="form-check-label" for="display_status">Active</label>
+                        </div> {% endcomment %}
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" id="display_status" type="checkbox" name="display_status">
+                            <label class="custom-control-label" for="display_status">Active</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="add_question" id="add_question">Submit <i class="ml-2" data-feather="arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "cssurvey/base_css.html" %}
+
+{% block content %}
+<div class="col-lg-9 mt-5">
+    <h1>{{ office }}</h1>
+    <p class="lead">Online Customer Satisfaction Survey</p>
+    <hr class="my-5" />
+    {% include 'cssurvey/messages.html' %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="form-group"><label for="respondentname">Fullname <span class="badge badge-info">optional</span></label><input class="form-control form-control-solid" id="respondentname" name="respondentname" type="text" placeholder="Enter your fullname here (optional)"></div>
+                <div class="form-group">
+                    <label for="respondenttype">I am a</label>
+                    <select class="form-control form-control-solid" id="respondenttype" name="respondenttype">
+                        <option>Student</option>
+                        <option>Parent</option>
+                        <option>Employee</option>
+                        <option>Alumni</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+    <!--            <div class="form-group"><label for="person_transacted">Person transacted with <span class="badge badge-info">optional</span></label><input class="form-control form-control-solid" id="person_transacted" name="person_transacted" type="text" placeholder="Enter name here (optional)"></div>-->
+            </div>
+        </div>
+
+        <hr class="my-5" />
+        <div class="card shadow">
+            <div class="card-body">
+                <h4>Please select the button corresponding to your answer.</h4>
+                {% comment %} <div class="label-inline">
+                    <label>1 <span class="badge badge-red">Poor</span></label>&emsp;
+                    <label>2 <span class="badge badge-orange">Fair</span></label>&emsp;
+                    <label>3 <span class="badge badge-yellow">Satisfactory</span></label>&emsp;
+                    <label>4 <span class="badge badge-teal">Very Satisfactory</span></label>&emsp;
+                    <label>5 <span class="badge badge-green">Outstanding</span></label>&emsp;
+                </div> {% endcomment %}
+                {% for question in questions %}
+                    <br><br><br>
+                    <h4 class="alert alert-primary alert-solid">{{ question.survey_question }}</h4>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input class="custom-control-input" id="questionOne{{ question.qid }}" type="radio" value="1" name="rate{{ question.qid }}">
+                        <label class="custom-control-label font-weight-800" for="questionOne{{ question.qid }}">1</label>
+                    </div>
+                    &emsp;&emsp;
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input class="custom-control-input" id="questionTwo{{ question.qid }}" type="radio" value="2" name="rate{{ question.qid }}">
+                        <label class="custom-control-label font-weight-800" for="questionTwo{{ question.qid }}">2</label>
+                    </div>
+                    &emsp;&emsp;
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input class="custom-control-input" id="questionThree{{ question.qid }}" type="radio" value="3" name="rate{{ question.qid }}">
+                        <label class="custom-control-label font-weight-800" for="questionThree{{ question.qid }}">3</label>
+                    </div>
+                    &emsp;&emsp;
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input class="custom-control-input" id="questionFour{{ question.qid }}" type="radio" value="4" name="rate{{ question.qid }}">
+                        <label class="custom-control-label font-weight-800" for="questionFour{{ question.qid }}">4</label>
+                    </div>
+                    &emsp;&emsp;
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input class="custom-control-input" id="questionFive{{ question.qid }}" type="radio" value="5" name="rate{{ question.qid }}">
+                        <label class="custom-control-label font-weight-800" for="questionFive{{ question.qid }}">5</label>
+                    </div>
+                {% endfor %}
+                <br><br><br>
+                <input type="hidden" name="token" value="{{ token }}">
+                <input type="hidden" name="officeno" value="{{ officeno }}">
+                <div class="form-group"><label for="comments">Comments and Suggestions <span class="badge badge-info">optional</span></label><textarea class="form-control form-control-solid" id="comments" name="comments" rows="5" placeholder="Enter your comments and suggestions here"></textarea></div>
+                <br><br><br>
+                <button class="btn font-weight-500 btn-info" type="submit">Submit<i class="ml-2" data-feather="arrow-right"></i></button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="col-lg-3">
+    <div class="nav-sticky">
+        <div class="card">
+            <div class="card-body">
+                <ul class="nav flex-column" id="stickyNav">
+                    <p class="font-weight-900">Legend</p>
+                    <li class="nav-item"><label class="font-weight-500">1 &emsp; <span class="badge badge-red">Poor</span></label></li>
+                    <li class="nav-item"><label class="font-weight-500">2 &emsp; <span class="badge badge-orange">Fair</span></label></li>
+                    <li class="nav-item"><label class="font-weight-500">3 &emsp; <span class="badge badge-yellow">Satisfactory</span></label></li>
+                    <li class="nav-item"><label class="font-weight-500">4 &emsp; <span class="badge badge-teal">Very Satisfactory</span></label></li>
+                    <li class="nav-item"><label class="font-weight-500">5 &emsp; <span class="badge badge-green">Outstanding</span></label></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

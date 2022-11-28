@@ -1,0 +1,79 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block title %} OCSS Control Panel {% endblock %}
+
+{% block page_title %} <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a> {% endblock %}
+
+{% block content %}
+
+<main>
+    <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
+        <div class="container">
+            <div class="page-header-content pt-4">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-auto mt-4">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="layout"></i></div>
+                            {{ office.officename }}
+                        </h1>
+                        <div class="page-header-subtitle">View or update office details</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main page content-->
+    <div class="container mt-n10">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div class="card card-header-actions mx-auto">
+                <div class="card-header text-success">
+                    Update Office Details
+                    <div>
+                        <div class="custom-control custom-checkbox mr-2">
+                            {{ form.is_active }}
+                            <label class="custom-control-label" for="is_active">Active</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% include 'cssurvey/messages.html' %}
+                    {% if success %}
+                        <div class="alert alert-success alert-icon" role="alert">
+                            <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            <div class="alert-icon-aside">
+                                <i data-feather="pocket"></i>
+                            </div>
+                            <div class="alert-icon-content">
+                                <h6 class="alert-heading">Success</h6>
+                                {{ success }}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <nav class="nav nav-borders">
+                        <a class="nav-link active ml-0 text-success" href="{% url 'view_office' office.officeid %}">Information</a>
+                        <a class="nav-link" href="{% url 'office_staff' office.officeid %}">Staff</a>
+                    </nav>
+                    <hr class="mt-0 mb-4" />
+                    <div class="form-group">
+                        <label for="officename">Office Name</label>
+                        {{ form.officename }}
+                    </div>
+                    <div class="form-group">
+                        <label for="officecode">Office Code</label>
+                        {{ form.officecode }}
+                    </div>
+                    <br>
+                    <div class="d-flex justify-content-between">
+                        <a class="btn font-weight-500 btn-danger" href="{% url 'offices' %}"><i class="mr-2" data-feather="arrow-left"></i> Back to list of offices</a>
+                        <button class="btn font-weight-500 btn-success mr-2" type="submit" role="button"><i class="mr-2" data-feather="pocket"></i> Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+{% endblock %}

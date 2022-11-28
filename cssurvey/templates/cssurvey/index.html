@@ -1,0 +1,17 @@
+{% extends "cssurvey/base_css.html" %}
+
+{% block content %}
+
+<h1>Digital Transformation Office</h1>
+<p class="lead">Online Customer Satisfaction Survey</p>
+<hr class="my-5" />
+<h2 class="mb-3">Data Privacy Notice</h2>
+<p>In compliance with the Data Privacy Act of 2012 (RA 10173), Central Mindanao University-Digital Transformation Office commits to protect and respect the privacy of the personal information being collected through this form. Personal information will be used to understand the demographics of our customers and to improve customer satisfaction and to improve services.</p>
+<p>The information they collect will be retained in 1 year and will be disposed of securely based on the Policy & Guidelines on the Disposal of Personal Information.</p>
+<p>The CMU-DTO has implemented appropriate organizational, technical and physical security measures to ensure the protection of the customers' personal information.</p>
+<p>Furthermore, by confirming you hereby consent for the processing of your personal information. For further questions or concerns related to data privacy and security, you may contact the University Data Protection Officer through info_privacy@cmu.edu.ph or visit CMU Data Privacy Website: privacy.cmu.edu.ph.</p>
+<br>
+<br>
+<a class="btn font-weight-500 btn-teal" href="{% url 'customersurvey' %}">I agree, proceed to survey<i class="ml-2" data-feather="arrow-right"></i></a>
+
+{% endblock %}

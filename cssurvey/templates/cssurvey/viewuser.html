@@ -1,0 +1,122 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block title %} OCSS Control Panel {% endblock %}
+
+{% block page_title %}
+    {% if user_group == 2 %}
+        <a class="navbar-brand" href="{% url 'controlpanel' %}">Help Desk Monitoring</a>
+    {% elif user_group == 3 %}
+        <a class="navbar-brand" href="{% url 'controlpanel' %}">Help Desk</a>
+    {% else %}
+        <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<main>
+    <header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
+        <div class="container-fluid">
+            <div class="page-header-content">
+                <div class="row align-items-center justify-content-between pt-3">
+                    <div class="col-auto mb-3">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="user"></i></div>
+                            Account Settings - {{ profile.first_name }}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main page content-->
+    <div class="container mt-4">
+        <!-- Account page navigation-->
+        <nav class="nav nav-borders">
+            {% if own %}
+                <a class="nav-link active ml-0" href="{% url 'my_account' %}">Profile</a>
+                <a class="nav-link" href="{% url 'my_password' %}">Security</a>
+            {% else %}
+                <a class="nav-link active ml-0" href="{% url 'view_user' profile.id %}">Profile</a>
+                <a class="nav-link" href="{% url 'change_password' profile.id %}">Security</a>
+            {% endif %}
+        </nav>
+        <hr class="mt-0 mb-4" />
+        {% include 'cssurvey/messages.html' %}
+        <div class="row">
+            <div class="col-xl-4">
+                <!-- Profile picture card-->
+                <div class="card">
+                    <div class="card-header text-success">Profile Picture</div>
+                    <div class="card-body text-center">
+                        <!-- Profile picture image-->
+                        <img class="img-account-profile rounded-circle mb-2" src="{% static 'assets/img/illustrations/profiles/profile-1.png' %}" alt="" />
+                        <!-- Profile picture help block-->
+                        <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+                        <!-- Profile picture upload button-->
+                        <button class="btn btn-primary btn-success" type="button">Upload new image</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-8">
+                <!-- Account details card-->
+                <div class="card mb-4">
+                    <div class="card-header text-success">Account Details</div>
+                    <div class="card-body">
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <!-- Form Group (username)-->
+                            <div class="form-group">
+                                <label class="small mb-1" for="username">Username</label>
+                                <input class="form-control" id="username" name="username" type="text" placeholder="Enter your username" value="{{ profile.username }}">
+                            </div>
+                            <!-- Form Row-->
+                            <div class="form-row">
+                                <!-- Form Group (first name)-->
+                                <div class="form-group col-md-6">
+                                    <label class="small mb-1" for="first_name">First name</label>
+                                    <input class="form-control" id="first_name" name="first_name" type="text" placeholder="Enter your first name" value="{{ profile.first_name }}"/>
+                                </div>
+                                <!-- Form Group (last name)-->
+                                <div class="form-group col-md-6">
+                                    <label class="small mb-1" for="last_name">Last name</label>
+                                    <input class="form-control" id="last_name" name="last_name" type="text" placeholder="Enter your last name" value="{{ profile.last_name }}"/>
+                                </div>
+                            </div>
+                            <!-- Form Row-->
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label class="small mb-1" for="job_position">Job Position</label>
+                                    <input class="form-control" id="job_position" name="job_position" type="text" placeholder="Enter job position" value="{{ profile_details.job_position }}"/>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="small mb-1" for="email">Email address</label>
+                                    <input class="form-control" id="email" type="email" name="email" placeholder="Enter your email address" value="{{ profile.email }}"/>
+                                </div>
+                            </div>
+                            {% if not own %}
+                                <div class="form-group">
+                                    <label class="small mb-1" for="id_office_id">Office</label>
+    <!--                                <input class="form-control" id="office_id" type="text" placeholder="Enter your office name" value="{{ profile_details.office_id }}"/>-->
+    <!--                                <select class="form-control" id="id_office_id" name="id_office_id">-->
+    <!--                                    <option value="profile_details.office_id">{{ profile_details.office_id }}</option>-->
+    <!--                                </select>-->
+                                    {{ form_profile.office_id }}
+                                </div>
+                            {% endif %}
+                            <br>
+                            <br>
+                            <!-- Save changes button-->
+                            {% if not own %}<a class="btn btn-primary btn-success mx-2 px-3" type="button" role="button" href="{% url 'user_accounts' %}"><i class="mr-2" data-feather="arrow-left"></i> Back to User Page</a>{% endif %}
+                            <button class="btn btn-primary btn-success mx-2 px-3" type="submit" role="button"><i class="mr-2" data-feather="save"></i> Save changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+{% endblock %}

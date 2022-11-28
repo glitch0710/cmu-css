@@ -1,0 +1,108 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block title %} OCSS Control Panel {% endblock %}
+
+{% block page_title %} <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a> {% endblock %}
+
+{% block content %}
+
+{% load static %}
+<main>
+    <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
+        <div class="container">
+            <div class="page-header-content pt-4">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-auto mt-4">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="briefcase"></i></div>
+                            Offices
+                        </h1>
+                        <div class="page-header-subtitle">View or update office details</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main page content-->
+    <div class="container mt-n10">
+        <div class="card mb-4 card-header-actions mx-auto">
+            <div class="card-header text-success">
+                Offices Management
+                <div>
+                    <button class="btn btn-success btn-icon mr-2" name="addOffice" id="addOffice" type="button" data-toggle="modal" data-target="#createOfficeModal">
+                        <i data-feather="plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% include 'cssurvey/messages.html' %}
+                <div class="datatable">
+                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr class="text-success">
+                                <th>Office Name</th>
+                                <th>Office Code</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr class="text-success">
+                                <th>Office Name</th>
+                                <th>Office Code</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            {% for office in offices %}
+                                <tr>
+                                    <td>{{ office.officename }}</td>
+                                    <td>{{ office.officecode }}</td>
+                                    {% if office.is_active %}
+                                        <td><div class="badge badge-success badge-pill">Active</div></td>
+                                    {% else %}
+                                        <td><div class="badge badge-warning badge-pill">Inactive</div></td>
+                                    {% endif %}
+                                    <td>
+                                        <a class="btn btn-datatable btn-icon btn-transparent-dark mr-2" href="{% url 'view_office' office.officeid %}"><i data-feather="eye"></i></a>
+                                        <a class="btn btn-datatable btn-icon btn-transparent-dark" href="{% url 'office_staff' office.officeid %}"><i data-feather="users"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="modal fade" id="createOfficeModal" tabindex="-1" role="dialog" aria-labelledby="createOfficeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Office</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="officename">Office Name</label>
+                            {{ form.officename }}
+                        </div>
+                        <div class="form-group">
+                            <label for="officecode">Office Code</label>
+                            {{ form.officecode }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="add_question" id="add_question">Submit <i class="ml-2" data-feather="arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+{% endblock %}
