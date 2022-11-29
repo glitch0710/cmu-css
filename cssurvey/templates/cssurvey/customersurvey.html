@@ -1,11 +1,13 @@
 {% extends "cssurvey/base_css.html" %}
 
 {% block content %}
-<div class="col-lg-9 mt-5">
+<div class="col-lg-12 mt-5">
     <h1>{{ office }}</h1>
     <p class="lead">Online Customer Satisfaction Survey</p>
     <hr class="my-5" />
     {% include 'cssurvey/messages.html' %}
+</div>
+<div class="col-lg-9">
     <form action="" method="POST">
         {% csrf_token %}
         <div class="card shadow">

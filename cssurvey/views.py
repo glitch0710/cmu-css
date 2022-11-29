@@ -122,45 +122,67 @@ def customersurvey(request):
                            'message': 'The token has been tampered!'})
     else:
         try:
-            officeno = request.POST.get('officeno')
-            token = request.POST.get('token')
-
-            ticketno = GeneratedLinks.objects.values_list('ticket_id', flat=True).get(token=token)
-            employee = Ticket.objects.get(id=ticketno).closed_by
-
-            form = TbCssrespondentsForm(request.POST)
-            if form.is_valid():
-                newcss = form.save(commit=False)
-
-                newcss.employee_id = employee
-                newcss.coverageid = TbCoverage.objects.latest('coverageid')
-                newcss.respondedofficeid = TbCmuoffices.objects.get(officeid=officeno)
-                newcss.save()
-
-            # get last id inserted
-            last_id = newcss.respondentid
-
             css_details = request.POST
+            err_values = []
+
             for question in questions:
                 rate = css_details.get('rate' + str(question.qid))
-                if int(rate) > 5:
-                    raise ValueError
+
+                if rate is None:
+                    err_values.append('none')
+                elif int(rate) > 5:
+                    err_values.append(rate)
                 elif int(rate) <= 0:
-                    raise ValueError
+                    err_values.append(rate)
+                else:
+                    continue
 
-                TbCssrespondentsDetails.objects.create(qid=TbQuestions.objects.get(qid=question.qid),
-                                                       respondentid=TbCssrespondents.objects.get(respondentid=last_id),
-                                                       rating=rate)
+            if len(err_values) == 0:
+                officeno = request.POST.get('officeno')
+                token = request.POST.get('token')
 
-            update_genlink = GeneratedLinks.objects.get(token=token)
-            update_genlink.status = 1
-            update_genlink.respondentid = TbCssrespondents.objects.get(respondentid=newcss.respondentid)
-            update_genlink.save()
+                ticketno = GeneratedLinks.objects.values_list('ticket_id', flat=True).get(token=token)
+                employee = Ticket.objects.get(id=ticketno).closed_by
 
-            return redirect('submitcss')
+                form = TbCssrespondentsForm(request.POST)
+                if form.is_valid():
+                    newcss = form.save(commit=False)
+
+                    newcss.employee_id = employee
+                    newcss.coverageid = TbCoverage.objects.latest('coverageid')
+                    newcss.respondedofficeid = TbCmuoffices.objects.get(officeid=officeno)
+                    newcss.save()
+
+                # get last id inserted
+                last_id = newcss.respondentid
+
+                css_details = request.POST
+                for question in questions:
+                    rate = css_details.get('rate' + str(question.qid))
+
+                    if rate is None:
+                        raise ValueError
+                    elif int(rate) > 5:
+                        raise ValueError
+                    elif int(rate) <= 0:
+                        raise ValueError
+
+                    TbCssrespondentsDetails.objects.create(qid=TbQuestions.objects.get(qid=question.qid),
+                                                        respondentid=TbCssrespondents.objects.get(respondentid=last_id),
+                                                        rating=rate)
+
+                update_genlink = GeneratedLinks.objects.get(token=token)
+                update_genlink.status = 1
+                update_genlink.respondentid = TbCssrespondents.objects.get(respondentid=newcss.respondentid)
+                update_genlink.save()
+
+                return redirect('submitcss')
+            else:
+                raise ValueError
+                
         except ValueError:
             messages.error(request, 'Bad data passed in. Please try again!')
-            return render('customersurvey')
+            return redirect('customersurvey')
 
 
 def submitcss(request):
@@ -755,7 +777,9 @@ def close_ticket(request, ticket_id):
             en_token = signer.sign_object({'token': random_token})
             client_email = ticket_close.email
 
-            gen_link = 'http://172.16.3.80:8000/css/?office=' + en_office + '&token=' + en_token
+            host = request.get_host()
+
+            gen_link = 'http://' + host + '/css/?office=' + en_office + '&token=' + en_token
             latest_ticket = ticket_close.id
 
             check_if_exists = GeneratedLinks.objects.filter(ticket_id=latest_ticket)
@@ -1047,6 +1071,7 @@ def data_visualization(request):
             all_offices = TbCmuoffices.objects.filter(is_active=1)[:5]
 
             list_of_offices = TbCssrespondents.objects.all().values_list('respondedofficeid', flat=True).distinct()
+            print(list_of_offices)
             list_of_offices_extracted = []
 
             for office in list_of_offices:
