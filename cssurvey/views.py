@@ -1016,19 +1016,105 @@ def office_admin(request):
         for comp in compsumm:
             data1.append(comp['c'])
 
-        context = {'user_group': user_group,
-                   'user_office': user_office,
-                   'open': opentick,
-                   'close': closetick,
-                   'decline': dectick,
-                   'unread': unread,
-                   'labels': json.dumps(labels),
-                   'data': json.dumps(data),
-                   'data1': json.dumps(data1),}
+
+        # student = TbCssrespondentsDetails.objects.select_related('TbCssRespondents').filter(respondedofficeid=user_office)
+
+        # student_rating = student.filter(respondenttype='Student')
+
+        css_obj = TbCssrespondentsDetails.objects.all()
+
+        student = []
+        parent = []
+        alumni = []
+        employee = []
+        other = []
+
+        for rating in css_obj:
+            if rating.respondentid.respondedofficeid == user_office_id:
+                if rating.respondentid.respondenttype == 'Student':
+                    student.append(int(rating.rating))
+                elif rating.respondentid.respondenttype == 'Parent':
+                    parent.append(int(rating.rating))
+                elif rating.respondentid.respondenttype == 'Alumni':
+                    alumni.append(int(rating.rating))
+                elif rating.respondentid.respondenttype == 'Employee':
+                    employee.append(int(rating.rating))
+                elif rating.respondentid.respondenttype == 'Other':
+                    other.append(int(rating.rating))
+        print(student)
+        if len(student) != 0:
+            student_ave = np.array([student])
+            student_main_ave = np.mean(student_ave)
+        else:
+            student_main_ave = 0
+
+        if len(parent) != 0:
+            parent_ave = np.array([parent])
+            parent_main_ave = np.mean(parent_ave)
+        else:
+            parent_main_ave = 0
+
+        if len(alumni) != 0:
+            alumni_ave = np.array([alumni])
+            alumni_main_ave = np.mean(alumni_ave)
+        else:
+            alumni_main_ave = 0
+
+        if len(employee) != 0:
+            employee_ave = np.array([employee])
+            employee_main_ave = np.mean(employee_ave)
+        else:
+            employee_main_ave = 0
+
+        if len(other) != 0:
+            other_ave = np.array([other])
+            other_main_ave = np.mean(other_ave)
+        else:
+            other_main_ave = 0
+
+        rating_per_type = [student_main_ave, parent_main_ave, alumni_main_ave, employee_main_ave, other_main_ave]
+        description = [
+            evaluate_desc(student_main_ave),
+            evaluate_desc(parent_main_ave),
+            evaluate_desc(alumni_main_ave),
+            evaluate_desc(employee_main_ave),
+            evaluate_desc(other_main_ave),
+        ]
+
+        context = {
+            'user_group': user_group,
+            'user_office': user_office,
+            'open': opentick,
+            'close': closetick,
+            'decline': dectick,
+            'unread': unread,
+            'labels': json.dumps(labels),
+            'data': json.dumps(data),
+            'data1': json.dumps(data1),
+            'rating_type': rating_per_type,
+            'desc': description,
+        }
 
         return render(request, 'cssurvey/monitoring/officeadmin.html', context)
     else:
         pass
+
+
+def evaluate_desc(rating):
+    if rating <= 5.00 and rating >= 4.51:
+        desc = "Outstanding"
+    elif rating <= 4.50 and rating >=3.51:
+        desc = "Very Satisfactory"
+    elif rating <= 3.50 and rating >=2.51:
+        desc = "Satisfactory"
+    elif rating <= 2.50 and rating >= 1.51:
+        desc = "Fair"
+    elif rating <= 1.50 and rating > 0:
+        desc = "Poor"
+    else:
+        desc = "No rating"
+
+    return desc
 
 
 @login_required(login_url='/login')
