@@ -1041,7 +1041,7 @@ def office_admin(request):
                     employee.append(int(rating.rating))
                 elif rating.respondentid.respondenttype == 'Other':
                     other.append(int(rating.rating))
-        print(student)
+        
         if len(student) != 0:
             student_ave = np.array([student])
             student_main_ave = np.mean(student_ave)
@@ -1072,7 +1072,24 @@ def office_admin(request):
         else:
             other_main_ave = 0
 
-        rating_per_type = [student_main_ave, parent_main_ave, alumni_main_ave, employee_main_ave, other_main_ave]
+        rating_per_type = [
+            round(student_main_ave, 2), 
+            round(parent_main_ave, 2), 
+            round(alumni_main_ave, 2),
+            round(employee_main_ave, 2),
+            round(other_main_ave, 2),
+        ]
+
+        sum_arr = np.sum([len(student), len(parent), len(alumni), len(employee), len(other)])
+
+        rating_sources = [
+            round(len(student)/sum_arr * 100, 2),
+            round(len(parent)/sum_arr * 100, 2),
+            round(len(alumni)/sum_arr * 100, 2),
+            round(len(employee)/sum_arr * 100, 2),
+            round(len(other)/sum_arr * 100, 2),
+        ]
+
         description = [
             evaluate_desc(student_main_ave),
             evaluate_desc(parent_main_ave),
@@ -1093,6 +1110,7 @@ def office_admin(request):
             'data1': json.dumps(data1),
             'rating_type': rating_per_type,
             'desc': description,
+            'rating_sources': rating_sources,
         }
 
         return render(request, 'cssurvey/monitoring/officeadmin.html', context)

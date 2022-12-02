@@ -133,7 +133,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <div class="small font-weight-bold text-blue mb-1">Student</div>
+                                    <div class="small font-weight-bold text-blue mb-1">Students</div>
                                     <div class="h3">{{ rating_type.0 }}</div>
 
                                     {% if desc.0 == 'Outstanding' or desc.0 == 'Very Satisfactory' %}
@@ -170,7 +170,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <div class="small font-weight-bold text-purple mb-1">Parent</div>
+                                    <div class="small font-weight-bold text-purple mb-1">Parents</div>
                                     <div class="h3">{{ rating_type.1 }}</div>
 
                                     {% if desc.1 == 'Outstanding' or desc.1 == 'Very Satisfactory' %}
@@ -244,7 +244,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <div class="small font-weight-bold text-yellow mb-1">Employee</div>
+                                    <div class="small font-weight-bold text-yellow mb-1">Employees</div>
                                     <div class="h3">{{ rating_type.3 }}</div>
 
                                     {% if desc.3 == 'Outstanding' or desc.3 == 'Very Satisfactory' %}
@@ -323,35 +323,35 @@
                                     <i class="fas fa-circle fa-sm mr-1 text-blue"></i>
                                     Student
                                 </div>
-                                <div class="font-weight-500 text-dark">55%</div>
+                                <div class="font-weight-500 text-dark">{{ rating_sources.0 }}%</div>
                             </div>
                             <div class="list-group-item d-flex align-items-center justify-content-between small px-0 py-2">
                                 <div class="mr-3">
                                     <i class="fas fa-circle fa-sm mr-1 text-purple"></i>
                                     Parent
                                 </div>
-                                <div class="font-weight-500 text-dark">15%</div>
+                                <div class="font-weight-500 text-dark">{{ rating_sources.1 }}%</div>
                             </div>
                             <div class="list-group-item d-flex align-items-center justify-content-between small px-0 py-2">
                                 <div class="mr-3">
                                     <i class="fas fa-circle fa-sm mr-1 text-green"></i>
                                     Alumni
                                 </div>
-                                <div class="font-weight-500 text-dark">30%</div>
+                                <div class="font-weight-500 text-dark">{{ rating_sources.2 }}%</div>
                             </div>
                             <div class="list-group-item d-flex align-items-center justify-content-between small px-0 py-2">
                                 <div class="mr-3">
                                     <i class="fas fa-circle fa-sm mr-1 text-secondary"></i>
                                     Employee
                                 </div>
-                                <div class="font-weight-500 text-dark">30%</div>
+                                <div class="font-weight-500 text-dark">{{ rating_sources.3 }}%</div>
                             </div>
                             <div class="list-group-item d-flex align-items-center justify-content-between small px-0 py-2">
                                 <div class="mr-3">
                                     <i class="fas fa-circle fa-sm mr-1 text-warning"></i>
                                     Others
                                 </div>
-                                <div class="font-weight-500 text-dark">30%</div>
+                                <div class="font-weight-500 text-dark">{{ rating_sources.4 }}%</div>
                             </div>
                         </div>
                     </div>
@@ -472,6 +472,50 @@
                     }
                 }
             }
+        }
+    });
+
+    // Pie Chart 
+    var ctx1 = document.getElementById("myPieChart");
+    var myPieChart = new Chart(ctx1, {
+        type: "doughnut",
+        data: {
+            labels: ["Student", "Parent", "Alumni", "Employee", "Other"],
+            datasets: [{
+                data: {{ rating_sources|safe }},
+                backgroundColor: [
+                    "rgba(0, 0, 255, 1)",
+                    "rgba(128, 0, 128, 1)",
+                    "rgba(0, 128, 0, 1)",
+                    "rgba(255, 198, 0, 1)",
+                    "rgba(138, 28, 74, 1)",
+                ],
+                hoverBackgroundColor: [
+                    "rgba(0, 0, 255, 0.6)",
+                    "rgba(128, 0, 128, 0.6)",
+                    "rgba(0, 128, 0, 0.6)",
+                    "rgba(255, 198, 0, 0.6)",
+                    "rgba(138, 28, 74, 0.6)",
+                ],
+                hoverBorderColor: "rgba(234, 236, 244, 1)"
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: "#dddfeb",
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10
+            },
+            legend: {
+                display: false
+            },
+            cutoutPercentage: 80
         }
     });
 </script>
