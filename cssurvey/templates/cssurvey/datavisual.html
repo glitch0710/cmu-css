@@ -35,27 +35,27 @@
     </header>
     <!-- Main page content-->
     <div class="container">
-        {% for rate in rating%}
-            {{ rate }}
-        {% endfor %}
-<!--        {{ rating }}-->
         {% include 'cssurvey/messages.html' %}
         <h4 class="mb-0 mt-5">Top Performing Offices</h4>
         <hr class="mt-2 mb-4" />
-        {% for office in all_offices %}
-            <a class="card card-icon lift lift-sm mb-4" href="">
-                <div class="row no-gutters">
-                    <div class="col-auto card-icon-aside bg-teal"><i class="text-white-50" data-feather="trending-up"></i></div>
-                    <div class="col">
-                        <div class="card-body py-4">
-                            <h5 class="card-title text-teal mb-2">{{ office.officename }}</h5>
-                            <p class="card-text mb-1">Click to view office performance</p>
-                            <div class="small text-muted">Active</div>
+        {% if msg %}
+            {% for rate in rating %}
+                <a class="card card-icon lift lift-sm mb-4" href="">
+                    <div class="row no-gutters">
+                        <div class="col-auto card-icon-aside bg-teal"><i class="text-white-50" data-feather="trending-up"></i></div>
+                        <div class="col">
+                            <div class="card-body py-4">
+                                <h5 class="card-title text-teal mb-2">{{ rate.respondedofficeid_name }}</h5>
+                                <p class="card-text mb-1">{{ rate.rating }}</p>
+                                <div class="small text-muted">Active</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </a>
-        {% endfor %}
+                </a>
+            {% endfor %}
+        {% else %}
+            <p class="h4">No processes reached the minimum respondents yet</p>
+        {% endif %}
     </div>
 </main>
 

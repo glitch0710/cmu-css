@@ -23,6 +23,7 @@ import datetime
 import random
 import json
 import numpy as np
+import operator
 
 
 def page_not_found_view(request, exception):
@@ -1017,10 +1018,6 @@ def office_admin(request):
             data1.append(comp['c'])
 
 
-        # student = TbCssrespondentsDetails.objects.select_related('TbCssRespondents').filter(respondedofficeid=user_office)
-
-        # student_rating = student.filter(respondenttype='Student')
-
         css_obj = TbCssrespondentsDetails.objects.all()
 
         student = []
@@ -1173,30 +1170,39 @@ def data_visualization(request):
             user_group = request.user.groups.all()[0].id
             user_office = TbEmployees.objects.get(user=request.user.id).office_id
             all_offices = TbCmuoffices.objects.filter(is_active=1)[:5]
+            msg_list_of_offices = True
 
-            list_of_offices = TbCssrespondents.objects.all().values_list('respondedofficeid', flat=True).distinct()
-            print(list_of_offices)
-            list_of_offices_extracted = []
+            # list_of_offices = TbCssrespondents.objects.all().values_list('respondedofficeid', flat=True).distinct()
+            list_of_offices = TbCssrespondents.objects.values('respondedofficeid').order_by('respondedofficeid').annotate(res_count=Count('respondedofficeid'))
 
+            rating_que_1 = TbCssrespondentsDetails.objects.all()
+            
             for office in list_of_offices:
-                rating_que_1 = TbCssrespondentsDetails.objects.all()
                 average = []
 
-                for rate in rating_que_1:
-                    off_id = TbCmuoffices.objects.get(officeid=office)
-                    if rate.respondentid.respondedofficeid == off_id:
-                        average.append(int(rate.rating))
+                if office['res_count'] >= settings.MINIMUM_CSS_RESPONDENTS:
+                    for rate in rating_que_1:
+                        off_id = TbCmuoffices.objects.get(officeid=office['respondedofficeid'])
+                        if rate.respondentid.respondedofficeid == off_id:
+                            average.append(int(rate.rating))
 
-                ave = np.array([average])
-                main_ave = np.mean(ave)
+                    ave = np.array([average])
+                    main_ave = np.mean(ave)
 
-                list_of_offices_extracted.append(main_ave)
+                    office['respondedofficeid_name'] = off_id
+                    office['rating'] = round(main_ave, 2)
+
+            try:
+                list_of_offices = sorted(list_of_offices, key=lambda r: r['rating'], reverse=True)
+            except KeyError:
+                msg_list_of_offices = False
 
             context = {
                 'user_group': user_group,
                 'user_office': user_office,
                 'all_offices': all_offices,
-                'rating': list_of_offices_extracted,
+                'rating': list_of_offices,
+                'msg': msg_list_of_offices,
             }
             return render(request, 'cssurvey/datavisual.html', context)
         except ValueError:

@@ -157,3 +157,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 # Redirect not authenticated users
 LOGIN_REDIRECT_URL = 'cpanel'
 LOGIN_URL = 'login/'
+
+# Minimum CSS record for office ranking
+MINIMUM_CSS_RESPONDENTS = 1
