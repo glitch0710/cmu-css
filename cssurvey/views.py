@@ -8,7 +8,7 @@ from django.contrib.auth import login, authenticate, logout, get_user_model, upd
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
@@ -906,43 +906,42 @@ def active_ticket(request):
 @login_required(login_url='/login')
 def closed_ticket(request):
     if request.method == 'GET':
-        if request.method == 'GET':
-            try:
-                user_group = request.user.groups.all()[0].id
-                user_office = TbEmployees.objects.get(user=request.user.id).office_id
+        try:
+            user_group = request.user.groups.all()[0].id
+            user_office = TbEmployees.objects.get(user=request.user.id).office_id
 
-                ticket_open = ticket_counter(user_office, request.user.id, 1)
-                ticket_close = ticket_counter(user_office, request.user.id, 3)
-                ticket_declined = ticket_counter(user_office, request.user.id, 2)
+            ticket_open = ticket_counter(user_office, request.user.id, 1)
+            ticket_close = ticket_counter(user_office, request.user.id, 3)
+            ticket_declined = ticket_counter(user_office, request.user.id, 2)
 
-                ticket_list = Ticket.objects.filter(office_id=user_office,
-                                                    assigned_to=request.user.id,
-                                                    status=3).order_by('-id')
+            ticket_list = Ticket.objects.filter(office_id=user_office,
+                                                assigned_to=request.user.id,
+                                                status=3).order_by('-id')
 
-                paginator = Paginator(ticket_list, 5)
-                next_ticket_no = Ticket.objects.latest('id').id + 1
+            paginator = Paginator(ticket_list, 5)
+            next_ticket_no = Ticket.objects.latest('id').id + 1
 
-                page_number = request.GET.get('page')
-                tickets = paginator.get_page(page_number)
-                nums = 'a' * tickets.paginator.num_pages
+            page_number = request.GET.get('page')
+            tickets = paginator.get_page(page_number)
+            nums = 'a' * tickets.paginator.num_pages
 
-                context = {
-                    'user_group': user_group,
-                    'tickets': tickets,
-                    'nums': nums,
-                    'searched': False,
-                    'next_ticket': next_ticket_no,
-                    'create_ticket': CreateTicketForm,
-                    'user_office': user_office,
-                    'ticket_open': ticket_open,
-                    'ticket_close': ticket_close,
-                    'ticket_declined': ticket_declined,
-                }
+            context = {
+                'user_group': user_group,
+                'tickets': tickets,
+                'nums': nums,
+                'searched': False,
+                'next_ticket': next_ticket_no,
+                'create_ticket': CreateTicketForm,
+                'user_office': user_office,
+                'ticket_open': ticket_open,
+                'ticket_close': ticket_close,
+                'ticket_declined': ticket_declined,
+            }
 
-                return render(request, 'cssurvey/helpdesk/helpdesk.html', context)
-            except ValueError:
-                messages.error(request, 'Error loading the page. Please try again')
-                return redirect('help_desk')
+            return render(request, 'cssurvey/helpdesk/helpdesk.html', context)
+        except ValueError:
+            messages.error(request, 'Error loading the page. Please try again')
+            return redirect('help_desk')
 
 
 @login_required(login_url='/login')
@@ -1201,7 +1200,7 @@ def data_visualization(request):
                 'user_group': user_group,
                 'user_office': user_office,
                 'all_offices': all_offices,
-                'rating': list_of_offices,
+                'rating': list_of_offices[:5],
                 'msg': msg_list_of_offices,
             }
             return render(request, 'cssurvey/datavisual.html', context)
@@ -1209,4 +1208,47 @@ def data_visualization(request):
             messages.error(request, 'Error loading the page. Please try again')
             return redirect('data_visualization')
     else:
-        pass
+        try:
+            data = request.POST
+            user_group = request.user.groups.all()[0].id
+            user_office = TbEmployees.objects.get(user=request.user.id).office_id
+            office_s = TbCmuoffices.objects.get(is_active=1, officename=data['searchOffice']).officeid
+            # office_s = get_object_or_404(TbCmuoffices, is_active=1, officename=data['searchOffice']).officeid
+
+            office_searched = TbCssrespondents.objects.filter(respondedofficeid=office_s).values('respondedofficeid').order_by('respondedofficeid').annotate(res_count=Count('respondedofficeid'))
+
+            rating_que_1 = TbCssrespondentsDetails.objects.all()
+                
+            for office in office_searched:
+                average = []
+
+                for rate in rating_que_1:
+                    off_id = TbCmuoffices.objects.get(officeid=office['respondedofficeid'])
+                    if rate.respondentid.respondedofficeid == off_id:
+                        average.append(int(rate.rating))
+
+                ave = np.array([average])
+                main_ave = np.mean(ave)
+
+                office['respondedofficeid_name'] = off_id
+                office['rating'] = round(main_ave, 2)
+
+            office_searched = sorted(office_searched, key=lambda r: r['rating'], reverse=True)
+
+            context = {
+                'user_group': user_group,
+                'user_office': user_office,
+                'rating': office_searched,
+                'msg': True,
+            }
+
+            return render(request, 'cssurvey/datavisual.html', context)
+        except ObjectDoesNotExist:
+            messages.error(request, 'Office not found. Please type full office name')
+            return redirect('data_visualization')
+
+
+
+        # return HttpResponse(office_searched)
+
+

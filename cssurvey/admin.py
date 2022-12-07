@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import TbCssrespondents, TbQuestions, TbCmuoffices, TbCmuofficials, TbCoverage, \
-    TbCssrespondentsDetails, TbEmployees
+    TbCssrespondentsDetails, TbEmployees, Ticket
 
 
 class CustomerFeedbackAdmin(admin.ModelAdmin):
@@ -18,3 +18,4 @@ admin.site.register(TbCmuofficials)
 admin.site.register(TbCoverage)
 admin.site.register(TbCssrespondentsDetails)
 admin.site.register(TbEmployees)
+admin.site.register(Ticket)
