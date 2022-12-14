@@ -1252,3 +1252,9 @@ def data_visualization(request):
         # return HttpResponse(office_searched)
 
 
+def ticket_submission(request):
+    if request.method == 'GET':
+        
+        return render(request, 'cssurvey/ticket/ticket_submission.html')
+    else:
+        pass

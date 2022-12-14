@@ -62,6 +62,9 @@ urlpatterns = [
     path('helpdesk/monitoring', views.office_admin, name='office_admin'),
     path('helpdesk/account', views.my_account, name='helpdesk_monitoring_account'),
     path('helpdesk/transactions', views.office_transactions, name='office_transactions'),
+
+    # Tickets
+    path('ticket/', views.ticket_submission, name='ticket_submission'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler404 = 'cssurvey.views.page_not_found_view'
