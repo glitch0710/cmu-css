@@ -543,23 +543,29 @@ def offices(request):
             signer = Signer()
             submit_form = TbCmuOfficesAddForm(request.POST)
 
-            if submit_form.is_valid():
-                # submit_form.save()
+            existing_code = TbCmuoffices.objects.filter(officecode=request.POST['officecode'])
 
-                new_off = submit_form.save(commit=False)
-                new_off_id = new_off.officeid 
-
-                off_qr_sign = signer.sign_object({'office': str(new_off_id)}) 
-                off_qr_link = 'http://172.16.3.80:8000/ticket/?office=' + off_qr_sign
-                
-                new_off.office_qr_link = off_qr_link
-                new_off.save()
-
-                messages.success(request, 'New office has been created')
+            if existing_code:
+                messages.error(request, 'Office Code already existing')
                 return redirect('offices')
             else:
-                messages.error(request, 'Form did not validate. Please try again.')
-                return redirect('offices')
+                if submit_form.is_valid():
+                    # submit_form.save()
+
+                    new_off = submit_form.save(commit=False)
+                    new_off_id = new_off.officecode
+
+                    off_qr_sign = signer.sign_object({'office': str(new_off_id)}) 
+                    off_qr_link = 'http://172.16.3.80:8000/ticket/?office=' + off_qr_sign
+                    
+                    new_off.office_qr_link = off_qr_link
+                    new_off.save()
+
+                    messages.success(request, 'New office has been created')
+                    return redirect('offices')
+                else:
+                    messages.error(request, 'Form did not validate. Please try again.')
+                    return redirect('offices')
         except ValueError:
             messages.error(request, 'Bad data passed in. Please try again.')
             return redirect('offices')
@@ -590,7 +596,7 @@ def view_office(request, office_pk):
                 # office_form.save()
 
                 new_off = office_form.save(commit=False)
-                new_off_id = new_off.officeid 
+                new_off_id = new_off.officecode
 
                 off_qr_sign = signer.sign_object({'office': str(new_off_id)}) 
                 off_qr_link = 'http://172.16.3.80:8000/ticket/?office=' + off_qr_sign
@@ -1278,12 +1284,27 @@ def data_visualization(request):
 
 def ticket_submission(request):
     if request.method == 'GET':
-        form = CreateTicketForm()
+        signer = Signer()
+        if request.GET.get('office'):
+            # implement this when finished with link generation for css
+            officeno = signer.unsign_object(request.GET.get('office'))
+            officeno_original = officeno['office']
+            print(officeno_original)
 
-        context = {
-            'form': form,
-        }
-        
-        return render(request, 'cssurvey/ticket/ticket_submission.html', context)
+            form = CreateTicketForm()
+            officename = TbCmuoffices.objects.get(officecode=officeno_original)
+
+            context = {
+                'form': form,
+                'office': officename
+            }
+            
+            return render(request, 'cssurvey/ticket/ticket_submission.html', context)
+        else:
+            # default for now
+            return render(request, 'cssurvey/manual404.html',
+                            {'title': 'Missing parameters',
+                            'message': 'No office targeted'})
+
     else:
         pass

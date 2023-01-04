@@ -5,13 +5,14 @@ from django.dispatch import receiver
 from io import BytesIO
 from django.core.files import File
 from PIL import Image, ImageDraw
+from django.core.signing import Signer
 import qrcode
 
 
 class TbCmuoffices(models.Model):
     officeid = models.AutoField(db_column='officeID', primary_key=True)  # Field name made lowercase.
     officename = models.TextField(db_column='officeName', blank=False, null=False)  # Field name made lowercase.
-    officecode = models.TextField(db_column='officeCode', blank=True, null=True)  # Field name made lowercase.
+    officecode = models.TextField(db_column='officeCode', blank=False, null=False)  # Field name made lowercase.
     office_email = models.CharField(max_length=100, blank=True, null=True)
     office_contact_no = models.CharField(max_length=11, blank=True, null=True)
     office_qr_link = models.CharField(max_length=255, blank=True, null=True)
@@ -35,7 +36,9 @@ class TbCmuoffices(models.Model):
             canvas.close()
             super().save(*args, **kwargs)
         else:
-            if self.office_qr == None:
+            print(self.office_qr == None)
+            print(self.office_qr is None)
+            if self.office_qr == None or self.office_qr is None:
                 qrcode_image = qrcode.make(self.office_qr_link)
                 canvas = Image.new('RGB', (500, 500), 'white')
                 draw = ImageDraw.Draw(canvas)
