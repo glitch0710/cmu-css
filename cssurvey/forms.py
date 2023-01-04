@@ -53,7 +53,7 @@ class UserProfileUpdateForm(ModelForm):
 class TbCmuOfficesForm(ModelForm):
     class Meta:
         model = TbCmuoffices
-        fields = ['officename','officecode','is_active',]
+        fields = ['officename','officecode','is_active','office_email','office_contact_no',]
         widgets = {
             'officename': Textarea(attrs={
                 'class': "form-control",
@@ -71,13 +71,24 @@ class TbCmuOfficesForm(ModelForm):
                 'name': "is_active",
                 'type': "checkbox"
             }),
+            'office_email': TextInput(attrs={
+                'class': "form-control",
+                'id': "office_email",
+                'name': "office_email",
+                'type': "email",
+            }),
+            'office_contact_no': TextInput(attrs={
+                'class': "form-control",
+                'id': "office_contact_no",
+                'name': "office_contact_no",
+            }),
         }
 
 
 class TbCmuOfficesAddForm(ModelForm):
     class Meta:
         model = TbCmuoffices
-        fields = ['officename', 'officecode',]
+        fields = ['officename', 'officecode', 'office_email', 'office_contact_no',]
         widgets = {
             'officename': Textarea(attrs={
                 'class': "form-control",
@@ -88,6 +99,17 @@ class TbCmuOfficesAddForm(ModelForm):
                 'class': "form-control",
                 'id': "officecode",
                 'name': "officecode",
+            }),
+            'office_email': TextInput(attrs={
+                'class': "form-control",
+                'id': "office_email",
+                'name': "office_email",
+                'type': "email",
+            }),
+            'office_contact_no': TextInput(attrs={
+                'class': "form-control",
+                'id': "office_contact_no",
+                'name': "office_contact_no",
             }),
         }
 
@@ -126,7 +148,7 @@ class CreateTicketForm(ModelForm):
                 'class': "form-control",
                 # 'id': "complaint",
                 # 'name': "complaint",
-                'placeholder': "Enter client's concern",
+                'placeholder': "Enter concern",
                 'required': True,
             })
         }

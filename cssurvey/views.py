@@ -19,6 +19,7 @@ from django.core.signing import Signer
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import get_template
 from django.conf import settings
+from qrcode import *
 import datetime
 import random
 import json
@@ -539,10 +540,21 @@ def offices(request):
         return render(request, 'cssurvey/offices.html', context)
     else:
         try:
+            signer = Signer()
             submit_form = TbCmuOfficesAddForm(request.POST)
 
             if submit_form.is_valid():
-                submit_form.save()
+                # submit_form.save()
+
+                new_off = submit_form.save(commit=False)
+                new_off_id = new_off.officeid 
+
+                off_qr_sign = signer.sign_object({'office': str(new_off_id)}) 
+                off_qr_link = 'http://172.16.3.80:8000/ticket/?office=' + off_qr_sign
+                
+                new_off.office_qr_link = off_qr_link
+                new_off.save()
+
                 messages.success(request, 'New office has been created')
                 return redirect('offices')
             else:
@@ -572,8 +584,20 @@ def view_office(request, office_pk):
         form = TbCmuOfficesForm(instance=office)
         office_form = TbCmuOfficesForm(request.POST, instance=office)
         try:
+            signer = Signer()
+
             if office_form.is_valid():
-                office_form.save()
+                # office_form.save()
+
+                new_off = office_form.save(commit=False)
+                new_off_id = new_off.officeid 
+
+                off_qr_sign = signer.sign_object({'office': str(new_off_id)}) 
+                off_qr_link = 'http://172.16.3.80:8000/ticket/?office=' + off_qr_sign
+                
+                new_off.office_qr_link = off_qr_link
+                new_off.save()
+
                 messages.success(request, 'Changes has been saved successfully')
                 return redirect('view_office', office_pk=office.officeid)
             else:
@@ -1254,7 +1278,12 @@ def data_visualization(request):
 
 def ticket_submission(request):
     if request.method == 'GET':
+        form = CreateTicketForm()
+
+        context = {
+            'form': form,
+        }
         
-        return render(request, 'cssurvey/ticket/ticket_submission.html')
+        return render(request, 'cssurvey/ticket/ticket_submission.html', context)
     else:
         pass

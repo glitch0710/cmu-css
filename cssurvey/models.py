@@ -2,17 +2,52 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from io import BytesIO
+from django.core.files import File
+from PIL import Image, ImageDraw
+import qrcode
 
 
 class TbCmuoffices(models.Model):
     officeid = models.AutoField(db_column='officeID', primary_key=True)  # Field name made lowercase.
     officename = models.TextField(db_column='officeName', blank=False, null=False)  # Field name made lowercase.
     officecode = models.TextField(db_column='officeCode', blank=True, null=True)  # Field name made lowercase.
+    office_email = models.CharField(max_length=100, blank=True, null=True)
+    office_contact_no = models.CharField(max_length=11, blank=True, null=True)
+    office_qr_link = models.CharField(max_length=255, blank=True, null=True)
+    office_qr = models.ImageField(upload_to='qr_code', default=None, max_length=255, blank=True, null=True)
     scope = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return self.officename
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            qrcode_image = qrcode.make(self.office_qr_link)
+            canvas = Image.new('RGB', (500, 500), 'white')
+            draw = ImageDraw.Draw(canvas)
+            canvas.paste(qrcode_image)
+            fname = f'qrcode-{self.officename}.png'
+            buffer = BytesIO()
+            canvas.save(buffer, 'PNG')
+            self.office_qr.save(fname, File(buffer), save=False)
+            canvas.close()
+            super().save(*args, **kwargs)
+        else:
+            if self.office_qr == None:
+                qrcode_image = qrcode.make(self.office_qr_link)
+                canvas = Image.new('RGB', (500, 500), 'white')
+                draw = ImageDraw.Draw(canvas)
+                canvas.paste(qrcode_image)
+                fname = f'qrcode-{self.officename}.png'
+                buffer = BytesIO()
+                canvas.save(buffer, 'PNG')
+                self.office_qr.save(fname, File(buffer), save=False)
+                canvas.close()
+                super().save(*args, **kwargs)
+            else:
+                super().save(*args, **kwargs)
 
     class Meta:
         managed = False
